@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Check, Calculator as CalcIcon } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 import Image from "next/image";
 
 const materials = [
@@ -314,7 +314,6 @@ export default function Calculator({ sectionClassName }: { sectionClassName?: st
                       className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-dark disabled:bg-zinc-200 disabled:text-zinc-400 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-[15px] transition-all"
                     >
                       Перейти до розрахунку вартості
-                      <CalcIcon className="w-4 h-4" />
                     </button>
                   )}
                   {step > 0 && (
