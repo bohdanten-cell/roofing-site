@@ -52,14 +52,15 @@ const services = [
 
 const container = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.06 } },
+  visible: { transition: { staggerChildren: 0.1 } },
 };
 
 const item = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.5, ease: "easeOut" as const },
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const },
   },
 };
 
@@ -93,7 +94,7 @@ export default function Services({ heading }: { heading?: string } = {}) {
           variants={container}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={{ once: true, margin: "-20px" }}
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           {services.map((service) => (
