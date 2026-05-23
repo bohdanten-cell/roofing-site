@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Quote, MessageSquare } from "lucide-react";
 
@@ -103,23 +103,26 @@ function ReviewCard({ review }: { review: typeof reviews[0] }) {
 export default function Reviews() {
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const touchStartX = useRef(0);
 
   const next = useCallback(() => {
     setDirection(1);
     setActive((a) => (a + 1) % (desktopMax + 1));
   }, []);
 
-  const prev = () => {
+  const prev = useCallback(() => {
     setDirection(-1);
     setActive((a) => (a - 1 + desktopMax + 1) % (desktopMax + 1));
+  }, []);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  useEffect(() => {
-    if (!isPlaying) return;
-    const timer = setInterval(next, 5000);
-    return () => clearInterval(timer);
-  }, [isPlaying, next]);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+  };
 
   const desktopSlice = reviews.slice(active, active + DESKTOP_VISIBLE);
 
@@ -153,8 +156,6 @@ export default function Reviews() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          onMouseEnter={() => setIsPlaying(false)}
-          onMouseLeave={() => setIsPlaying(true)}
         >
           {/* Desktop: 3 cards */}
           <div className="hidden lg:block overflow-hidden">
@@ -180,8 +181,12 @@ export default function Reviews() {
             </AnimatePresence>
           </div>
 
-          {/* Mobile: single card */}
-          <div className="lg:hidden bg-white rounded-3xl overflow-hidden shadow-sm">
+          {/* Mobile: single card with swipe */}
+          <div
+            className="lg:hidden bg-white rounded-3xl overflow-hidden shadow-sm"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
@@ -234,16 +239,6 @@ export default function Reviews() {
             </div>
           </div>
 
-          {/* Progress bar */}
-          {isPlaying && (
-            <motion.div
-              key={`progress-${active}`}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 5, ease: "linear" }}
-              className="h-[2px] bg-accent origin-left mt-3 rounded-full"
-            />
-          )}
         </motion.div>
 
       </div>
